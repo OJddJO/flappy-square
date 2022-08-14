@@ -57,7 +57,7 @@ class UI:
                 run = True
                 while run:
                     run = game.run()
-                    sleep(1/60)
+                    sleep(1/240)
                 while keydown(KEY_OK):
                     pass
                 return True
