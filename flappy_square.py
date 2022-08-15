@@ -6,26 +6,29 @@ from random import randint
 def dSquare(x, y, length, color):
     fRect(int(x-length/2), int(y-length/2), length, length, color)
 
-bgCol = (190, 230, 255)
+light = [(190, 230, 255), (220, 240, 255), (0, 240, 0), (0, 0, 0)]
+dark = [(20, 40, 65), (20, 20, 45), (0, 40, 0), (255, 255, 255)]
+selCol = light
 
 
 class UI:
     
     def __init__(self):
 
-        self.optionList = ["    Play    ", "    Exit    ", "[OK] to jump"]
+        self.optionList = ["    Play    ", "    Exit    ", "   Bright   ", "[OK] to jump"]
         self.modifiedList = []
         self.select = 0
         self.draw()
 
 
     def draw(self):
-        fRect(0, 0, 320, 222, bgCol)
-        dStr("Flappy Square", 95, 80, (200, 50, 70), bgCol)
-        dStr("by OJd_dJO", 110, 98, (200, 50, 70), bgCol)
+        fRect(0, 0, 320, 222, selCol[0])
+        dStr("Flappy Square", 95, 80, (200, 50, 70), selCol[0])
+        dStr("by OJd_dJO", 110, 98, (200, 50, 70), selCol[0])
 
 
     def update(self):
+        global selCol
         self.modifiedList = []
         for element in self.optionList:
             if element == self.optionList[self.select]:
@@ -37,20 +40,20 @@ class UI:
             yMod = 18*i
             length = len(element)*10
             if element == self.modifiedList[self.select]:
-              dStr(element, 160-int(length/2), 140+yMod, (0, 0, 0), (220, 240, 255))
+              dStr(element, 160-int(length/2), 140+yMod, selCol[3], selCol[1])
             else:
-              dStr(element, 160-int(length/2), 140+yMod, (0, 0, 0), bgCol)
+              dStr(element, 160-int(length/2), 140+yMod, selCol[3], selCol[0])
             i += 1
         if keydown(KEY_DOWN):
             self.select += 1
-            if self.select == 3:
+            if self.select == 4:
                 self.select = 0
             while keydown(KEY_DOWN):
                 pass
         elif keydown(KEY_UP):
             self.select -= 1
             if self.select == -1:
-                self.select = 2
+                self.select = 3
             while keydown(KEY_UP):
                 pass
 
@@ -65,21 +68,31 @@ class UI:
                     pass
                 return True
             if self.select == 1:
-                fRect(0, 0, 320, 222, bgCol)
+                fRect(0, 0, 320, 222, selCol[0])
                 return False
             if self.select == 2:
+                if self.optionList[2] == "   Bright   ":
+                    self.optionList[2] = "    Dark    "
+                    selCol = dark
+                    self.draw()
+                elif self.optionList[2] == "    Dark    ":
+                    self.optionList[2] = "   Bright   "
+                    selCol = light
+                    self.draw()
+                while keydown(KEY_OK):
+                    pass
+            if self.select == 3:
                 pass
         return True
 
 class Game:
     
     def __init__(self):
-
         self.player = Player()
         self.obsList = []
         self.tick = 0
         self.score = 0
-        fRect(0, 0, 320, 222, bgCol)
+        fRect(0, 0, 320, 222, selCol[0])
 
 
     def testLose(self):
@@ -91,7 +104,7 @@ class Game:
         if self.player.gameOver:
             run = False
         if not run:
-            dStr("Game Over !", 110, 100, (0, 0, 0), bgCol)
+            dStr("Game Over !", 110, 100, selCol[3], selCol[0])
             while not keydown(KEY_OK):
                 pass
             return False
@@ -115,14 +128,13 @@ class Game:
     def run(self):
         self.player.update()
         self.addObs()
-        dStr("Score: "+str(self.score), 200, 10, (0, 0, 0), bgCol)
+        dStr("Score: "+str(self.score), 200, 10, selCol[3], selCol[0])
         return self.testLose()
 
 
 class Player:
 
     def __init__(self):
-
         self.col = (240, 0, 0)
         self.pos = [40, 111]
         self.yVel = 0
@@ -151,13 +163,13 @@ class Player:
 
     def collider(self):
         for i in range(11):
-            if gCol(self.pos[0]-5+i, self.pos[1]-6) == (0, 240, 0):
+            if gCol(self.pos[0]-5+i, self.pos[1]-6) == selCol[2]:
                 self.gameOver = True
         for i in range(11):
-            if gCol(self.pos[0]-5+i, self.pos[1]+6) == (0, 240, 0):
+            if gCol(self.pos[0]-5+i, self.pos[1]+6) == selCol[2]:
                 self.gameOver = True
         for i in range(10):
-            if gCol(self.pos[0]+6, self.pos[1]-5+i) == (0, 240, 0):
+            if gCol(self.pos[0]+6, self.pos[1]-5+i) == selCol[2]:
                 self.gameOver = True
 
 
@@ -166,9 +178,9 @@ class Player:
         if self.yVel == 0:
             return
         if self.yVel < 0:
-            fRect(self.pos[0]-5, self.pos[1]+5, 10, abs(int(self.yVel)), bgCol)
+            fRect(self.pos[0]-5, self.pos[1]+5, 10, abs(int(self.yVel)), selCol[0])
         elif self.yVel > 0:
-            fRect(self.pos[0]-5, self.pos[1]-5, 10, -abs(int(self.yVel)), bgCol)
+            fRect(self.pos[0]-5, self.pos[1]-5, 10, -abs(int(self.yVel)), selCol[0])
 
 
     def update(self):
@@ -185,7 +197,7 @@ class Obstacle:
     def __init__(self, y, modifier):
         self.x = 320
         self.y = y
-        self.col = (0, 240, 0)
+        self.col = selCol[2]
         self.destroy = False
         self.modifier = modifier
 
@@ -196,10 +208,10 @@ class Obstacle:
         fRect(self.x-5, self.y-60+self.modifier, 30, 20, self.col)
         fRect(self.x-5, self.y+30-self.modifier, 30, 20, self.col)
 
-        fRect(self.x+20, 0, 2, self.y-60+self.modifier, bgCol)
-        fRect(self.x+20, self.y+50-self.modifier, 2, 222, bgCol)
-        fRect(self.x+25, self.y-60+self.modifier, 2, 20, bgCol)
-        fRect(self.x+25, self.y+30-self.modifier, 2, 20, bgCol)
+        fRect(self.x+20, 0, 2, self.y-60+self.modifier, selCol[0])
+        fRect(self.x+20, self.y+50-self.modifier, 2, 222, selCol[0])
+        fRect(self.x+25, self.y-60+self.modifier, 2, 20, selCol[0])
+        fRect(self.x+25, self.y+30-self.modifier, 2, 20, selCol[0])
 
     
     def score(self):
