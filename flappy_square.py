@@ -3,7 +3,6 @@ from ion import *
 from time import sleep
 from random import randint
 
-
 def dSquare(x, y, length, color):
     fRect(int(x-length/2), int(y-length/2), length, length, color)
 
@@ -23,6 +22,7 @@ class UI:
     def draw(self):
         fRect(0, 0, 320, 222, bgCol)
         dStr("Flappy Square", 95, 80, (200, 50, 70), bgCol)
+        dStr("by OJd_dJO", 110, 98, (200, 50, 70), bgCol)
 
 
     def update(self):
@@ -36,7 +36,10 @@ class UI:
         for element in self.modifiedList:
             yMod = 18*i
             length = len(element)*10
-            dStr(element, 160-int(length/2), 140+yMod, (0, 0, 0), bgCol)
+            if element == self.modifiedList[self.select]:
+              dStr(element, 160-int(length/2), 140+yMod, (0, 0, 0), (220, 240, 255))
+            else:
+              dStr(element, 160-int(length/2), 140+yMod, (0, 0, 0), bgCol)
             i += 1
         if keydown(KEY_DOWN):
             self.select += 1
@@ -87,9 +90,8 @@ class Game:
             run = False
         if self.player.gameOver:
             run = False
-        if run == False:
+        if not run:
             dStr("Game Over !", 110, 100, (0, 0, 0), bgCol)
-            dStr("Score: "+str(self.score), 200, 10, (0, 0, 0), bgCol)
             while not keydown(KEY_OK):
                 pass
             return False
