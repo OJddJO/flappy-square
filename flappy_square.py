@@ -1,4 +1,4 @@
-from kandinsky import fill_rect as fRect,draw_string as dStr
+from kandinsky import fill_rect as fRect,draw_string as dStr,get_pixel as gCol
 from ion import *
 from time import sleep
 from random import randint
